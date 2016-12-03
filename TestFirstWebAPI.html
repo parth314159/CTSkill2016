@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Product App</title>
+</head>
+<body>
+
+    <div>
+        <h2>All Products</h2>
+        <table id="ptable" border="1" style="border-collapse:collapse"></table>
+    </div>
+    <div>
+        <h2>Search by ID</h2>
+        <input type="text" id="prodId" size="5" />
+        <input type="button" value="Search" onclick="search();" />
+        <div id="product" />
+    </div>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+        var uri = 'https://restcountries.eu/rest/v1/all';
+
+        $(document).ready(function () {
+            // Send an AJAX request
+            $.getJSON(uri)
+                .done(function (data) {
+                    console.log(data[0].alpha2Code);
+                    // on success, 'data' contains a list of products.
+                    var topRow = "<tr>";
+                    $.each(data[0], function (key, item) {
+                        topRow += addHeading(key);
+                    });
+                    topRow += "</tr>";
+
+                    $('#ptable').append(topRow);
+                    $.each(data, function (key, item) {
+                        $('#ptable').append(addRow(item));
+                    });
+
+                });
+        });
+
+        function addHeading(item) {
+            return '<th>' + item + '</th>';
+        }
+
+        function addRow(item) {
+            return '<tr><td>' + item.name + '</td><td>' + item.ProductName + '</td><td>$' + item.Price;
+        }
+
+        function formatItem(item) {
+            return item.ProductId + ' ' + item.ProductName + ' $' + item.Price +
+                ' ' + item.StockLevel + ' ';
+        }
+
+        function search() {
+            var id = $('#prodId').val();
+            $.getJSON(uri + '/' + id)
+                .done(function (data) {
+                    $('#product').text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $('#product').text('Error: ' + err);
+                });
+        }
+    </script>
+</body>
+</html>
